@@ -4,6 +4,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const contabilizarRoutes = require('./routes/contabilizar');
 const historicoRoutes = require('./routes/historico');
+const db = require('./sqlitedb.js');
 
 // Configurações do CORS
 app.use(cors());
