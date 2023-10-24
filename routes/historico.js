@@ -3,7 +3,7 @@ const moment = require('moment-timezone');
 const router = express.Router();
 const db = require('../sqlitedb.js');
 
-// Rota para obter histórico por ID
+// Rota para obter o histórico de registros com base no ID fornecido.
 router.get('/:id', (req, res) => {
     const id = req.params.id;
     const sqlQuery = `SELECT * FROM Historico WHERE ID = ? ORDER BY DATAHISTORICO DESC`;
@@ -19,25 +19,22 @@ router.get('/:id', (req, res) => {
                 DATAHISTORICO: row.DataHistorico,
                 FUNCIONARIO: row.Funcionario,
             }));
-            res.json(jsonData); // Retorna um array de objetos JSON
+            res.json(jsonData);
         }
     });
 });
 
-// Rota para inserir um registro de histórico
+// Rota para adicionar um novo registro de histórico.
 router.post('/', (req, res) => {
     const { ID, HISTORICO, FUNCIONARIO } = req.body;
 
-    // Obtenha a data atual em UTC
+    // Obtenção da data e hora atual em São Paulo no formato UTC.
     const dataAtualUTC = moment.utc();
     const dataSaoPaulo = dataAtualUTC.tz('America/Sao_Paulo');
 
-    // Aqui você pode adicionar lógica para limitar o número de registros conforme necessário
-    const maxRegistrosPermitidos = 10; // Defina a quantidade máxima desejada
+    const maxRegistrosPermitidos = 10;
 
     if (maxRegistrosPermitidos) {
-        // Implemente a verificação de limite de registros aqui
-        // Verifique o número atual de registros para o ID e compare com maxRegistrosPermitidos
         const sqlCountQuery = `SELECT COUNT(*) as count FROM Historico WHERE ID = ?`;
 
         db.get(sqlCountQuery, [ID], (err, result) => {
@@ -49,7 +46,6 @@ router.post('/', (req, res) => {
                 if (count >= maxRegistrosPermitidos) {
                     res.json({ maxRegistro: 1, success: 0 });
                 } else {
-                    // Use a data em UTC ao inserir no banco de dados
                     const sqlQuery = `INSERT INTO Historico (ID, HISTORICO, DATAHISTORICO, FUNCIONARIO) VALUES (?, ?, ?, ?)`;
 
                     db.run(sqlQuery, [ID, HISTORICO, dataSaoPaulo.format('YYYY-MM-DD HH:mm:ss'), FUNCIONARIO], function (err) {

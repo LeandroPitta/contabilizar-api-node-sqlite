@@ -3,18 +3,18 @@ const moment = require('moment-timezone');
 const router = express.Router();
 const db = require('../sqlitedb.js');
 
+// Função para converter uma data e hora em um formato ISO.
 function convertToISODate(dateString) {
     const match = dateString.match(/(\d{4})(\d{2})(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
     if (match) {
         const [, year, month, day, hours, minutes, seconds] = match;
         return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000Z`;
     }
-    return null; // Retorna nulo se a data não puder ser convertida
+    return null;
 }
 
-// Rota para obter lançamentos do banco
+// Rota para listar todos os registros da tabela 'Contabilizar'.
 router.get('/', (req, res) => {
-    // Implemente a consulta SQL para obter lançamentos do banco de dados
     const sqlQuery = 'SELECT ID, DataEfetiva, Credito, Debito, Status, UltimoStatus FROM Contabilizar ORDER BY DataEfetiva DESC';
 
     db.all(sqlQuery, [], (err, rows) => {
@@ -22,7 +22,6 @@ router.get('/', (req, res) => {
             console.error(err);
             res.status(500).json({ error: 'Erro ao consultar o banco de dados' });
         } else {
-            // Construa a resposta JSON a partir dos resultados da consulta
             const jsonData = rows.map((row) => ({
                 ID: row.ID,
                 DataEfetiva: convertToISODate(row.DataEfetiva),
@@ -37,7 +36,7 @@ router.get('/', (req, res) => {
     });
 });
 
-// Rota para obter um lançamento pelo ID no banco de dados (outra rota alternativa)
+// Rota para obter um registro específico da tabela 'Contabilizar' com base no ID.
 router.get('/:id', (req, res) => {
     const id = req.params.id;
     const sqlQuery = 'SELECT * FROM Contabilizar WHERE ID = ?';
@@ -64,7 +63,7 @@ router.get('/:id', (req, res) => {
     });
 });
 
-// Rota para atualizar o status de um lançamento
+// Rota para atualizar o status de um registro na tabela 'Contabilizar'.
 router.put('/:id', (req, res) => {
     const id = req.params.id;
     const { Status, UltimoStatus } = req.body;

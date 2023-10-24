@@ -6,10 +6,10 @@ const contabilizarRoutes = require('./routes/contabilizar');
 const historicoRoutes = require('./routes/historico');
 const db = require('./sqlitedb.js');
 
-// Configurações do CORS
+// Configura o uso do middleware Cors para permitir requisições de domínios diferentes.
 app.use(cors());
 
-// Configuração do parser para o corpo da requisição
+// Configura o uso do middleware Body Parser para interpretar dados no corpo das requisições em formato JSON.
 app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
